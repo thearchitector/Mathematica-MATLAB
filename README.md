@@ -1,6 +1,6 @@
 <img src="/tomatlab.svg" width="128">
 
-# Mathematica-Matlab
+# Mathematica-MATLAB
 A Wolfram Language Package for converting Mathematica syntax to MATLAB code. It was originally created by Harri Ojanen, but has been updated and modified for functionality and clarity.
 
 ## Installation
