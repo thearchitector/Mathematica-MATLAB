@@ -15,7 +15,9 @@ Usage of the package is very simple. In whatever Mathematica script you are edit
 Needs["ToMatlab`"];
 ```
 
-to its beginning. When you wish to convert an output to MATLAB syntax, simply add `// ToMatlab` to the end of the line. In all cases, variable names are preserved if originally symbolic. For example, the parametric equation for a circle can be convered to MATLAB syntax.
+to its beginning. When you wish to convert an output to MATLAB syntax, simply add `// ToMatlab` to the end of the line. In all cases, variable names are preserved if originally symbolic. Non-unicode characters, such as greek letters, are converted to their character names. For example, `α` will become `alpha`.
+
+A simple use-case might be the conversion of a parametric equation for a circle to MATLAB.
 
 ```
 r[u_] = {R*Cos[u], R*Sin[u], 0};
@@ -39,11 +41,13 @@ On occasion, Mathematica lists may want to be converted to MATLAB column matrice
 r[u_] = {A*Cos[u], A*Sin[u], B*u};
 ToMatlab[r[u], Transpose -> True, SuppressOutput -> False]
 
---> [A.*cos(u); A.*sin(u); B.*u];
+--> [A.*cos(u); A.*sin(u); B.*u]
 ```
 
-Note that when converting lists to matrices, MATLAB requires uniform dimensionality. In the context of our parametric equation, the last column must be of size `u` if `u` is a matrix. In this case, making the last entry `0*u` when in MATLAB will solve this problem. This applies to all columns or rows of any matrix. In the cases where a constant is output, it can be changed to a vector with the `ones` and `size` commands. If we wanted a column of dimensionality `u` and of value `k`, we could enter either `k*ones(size(1, u))` or `k*(u./u)`.
+If you find that your program repeats the `Transpose` or `SuppressOutput`, you can also set the default options for `ToMatlab` with `SetOptions[ToMatlab, { Transpose -> True, SuppessOutput -> False }]`.
 
 Currently, the only options supported are `Transpose` and `SuppressOutput`. If you have suggestions on additional configuration parameters, please submit an Issue or Pull Request.
 
-> This program was modified and improved for the lives of the students taking Quantatative Engineering Analysis at Olin College.
+_NOTE: When converting lists to matrices, MATLAB requires uniform dimensionality. In the context of our parametric equation, the last column must be of size `u` if `u` is a matrix. In this case, making the last entry `0*u` when in MATLAB will solve this problem. This applies to all columns or rows of any matrix. In the cases where a constant is output, it can be changed to a vector with the `ones` and `size` commands. If we wanted a column of dimensionality `u` and of value `k`, we could enter either `k*ones(size(1, u))` or `k*(u./u)`._
+
+> This program was adapted for the lives of the students taking Quantatative Engineering Analysis at Olin College.
