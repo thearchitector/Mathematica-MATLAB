@@ -69,7 +69,7 @@ translate[l_List] := "[" <> args[l] <> "]"
 
 (*** Symbols *****************************************************************)
 
-translate[e_Symbol] := ToLowerCase[CharacterName[ToString[e]]]
+translate[e_Symbol] := If[PrintableASCIIQ[ToString[e]],ToString[e],ToLowerCase[CharacterName[ToString[e]]]]
 
 translate[Colon] = ":"
 translate[Abs] = "abs"
@@ -106,6 +106,7 @@ translate[Pi] := "pi "
 translate[E] := "exp(1)"
 translate[True] := "1"
 translate[False] := "0"
+translate[Cross] := "cross"
 
 
 (*** Relational operators ****************************************************)
