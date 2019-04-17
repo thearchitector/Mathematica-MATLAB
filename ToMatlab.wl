@@ -150,11 +150,12 @@ translate[Log[10, z_]] := "log10(" <> translate[z] <> ")"
 translate[Log[b_, z_]] := "log(" <> translate[z] <> ")./log(" <> translate[b] <> ")"
 translate[Power[e_, 1/2]] := "sqrt(" <> translate[e] <> ")"
 translate[Power[E, z_]] := "exp(" <> translate[z] <> ")"
+translate[Cross[a_,b_]] := "cross(" <> translate[a] <> ", " <> translate[b] <> ", " <> translate[Length[a]] <> ")"
 translate[If[test_, t_, f_]] := Block[{teststr = translate[test]}, "((" <> teststr <> ").*(" <> translate[t] <> ")+(~(" <> teststr <> ")).*(" <> translate[f] <> "))"]
 translate[e__ /; (Head[e] === Max || Head[e] == Min)] := translate[Head[e]] <> "(" <> If[Length[e] === 2, args[e] <> ")", translate[e[[1]]] <> ", " <> translate[listshiftretain[e]] <> ")"]
 translate[Colon[a_,b_]] := "((" <> translate[a] <> "):(" <> translate[b] <> "))"
 translate[Colon[a_,b_,c_]] := "((" <> translate[a] <> "):(" <> translate[b] <> "):(" <> \[AliasDelimiter][c] <> "))"
-translate[Cross[a_,b_]] := "cross(" <> translate[a] <> ", " <> translate[b] <> ", " <> translate[Length[a]] <> ")"
+
 
 (*** Internal functions *******************************************************)
 
