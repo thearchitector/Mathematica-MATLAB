@@ -1,11 +1,11 @@
 (* ::Package:: *)
 
 (* 
-A utility package for converting Mathematica syntax to MATLAB code. Originally created by Harri Ojanen, and modified for functionality and clarity by Elias Gabriel.
+A utility package for converting Mathematica syntax to MATLAB code. Originally created by Harri Ojanen, and modified for more functionality and clarity by Elias Gabriel.
 
 2019 Elias Gabriel
 eliasfgabriel@gmail.com
-https://www.linkedin.com/in/eliasfgabriel/
+https://eliasfgabriel.com
 
 1997-1999 Harri Ojanen
 harri.ojanen@iki.fi
@@ -21,17 +21,22 @@ BeginPackage["ToMatlab`"]
 
 ToMatlab::usage = "ToMatlab[expr, {prop_1 \[Rule] val_1, prop_2 \[Rule] val_2, ...}] converts the expression into MATLAB syntax and returns it as a string."
 Begin["`Private`"]
+ToMatlab::invsupp = "Output suppression must be True or False, not `1`."
 ToMatlab::invtrans = "Matrix transposition option expects True or False, not `1`."
+ToMatlab::invmargin = "Viewport margin must be an integer value, not `1`."
 
-ToMatlab[e_, OptionsPattern[]] := Catch[If[ListQ[e] || MatrixQ[e],
-	If[BooleanQ[OptionValue[Transpose]],
-		Block[{lm = If[Length[Dimensions[e]] > 1, e, {e}]}, translate[If[OptionValue[Transpose], Transpose[lm], lm]]],
-		Throw[Message[ToMatlab::invtrans, OptionValue[Transpose]]]
-	],
-	translate[e]
-] <> If[BooleanQ[OptionValue[SuppressOutput]] && OptionValue[SuppressOutput], ";", ""]]
+ToMatlab[e_, OptionsPattern[]] := Catch[Block[{},
+	If[!BooleanQ[OptionValue[SuppressOutput]], Throw[Message[ToMatlab::invsupp, OptionValue[SuppressOutput]]]];
+	If[!BooleanQ[OptionValue[Transposed]], Throw[Message[ToMatlab::invtrans, OptionValue[Transposed]]]];
+	If[!IntegerQ[OptionValue[Viewport]], Throw[Message[ToMatlab::invmargin, OptionValue[Viewport]]]];
 
-Options[ToMatlab] = {SuppressOutput -> True, Transpose -> False}
+	linewrap[If[ListQ[e] || MatrixQ[e],
+		Block[{lm = If[Length[Dimensions[e]] > 1, e, {e}]}, translate[If[OptionValue[Transposed], Transpose[lm], lm]]],
+		translate[e]
+	], GetOption[Viewport]
+] <> If[OptionValue[SuppressOutput], ";", ""]]]
+
+Options[ToMatlab] = {SuppressOutput -> True, Transposed -> False, Viewport -> 72}
 
 
 (*** Numbers and strings *****************************************************)
@@ -49,7 +54,7 @@ translate[c_Complex] := "(" <> If[Re[c] === 0, "", translate[Re[c]] <> "+"] <> I
 isnumericmatrix[m_] := MatrixQ[m] && (And @@ Map[isnumericlist, m])
 isnumericlist[l_] := ListQ[l] && (And @@ Map[NumberQ, l])
 numbermatrix[m_] := Block[{i, s=""}, 
-	For[i=1, i <= Length[m], i++,
+	For[i = 1, i <= Length[m], i++,
 	    s = s <> numbermatrixrow[m[[i]]];    
 	    If[i < Length[m], s = s <> "; "]
 	];
@@ -69,7 +74,7 @@ translate[l_List] := "[" <> args[l] <> "]"
 
 (*** Symbols *****************************************************************)
 
-translate[e_Symbol] := If[PrintableASCIIQ[ToString[e]],ToString[e],ToLowerCase[CharacterName[ToString[e]]]]
+translate[e_Symbol] := If[PrintableASCIIQ[ToString[e]], ToString[e], ToLowerCase[CharacterName[ToString[e]]]]
 
 translate[Colon] = ":"
 translate[Abs] = "abs"
@@ -145,7 +150,7 @@ translate[e_ /; Head[e] === Power] := If[Head[e[[1]]] === Plus || Head[e[[1]]] =
 
 (*** Special function cases **********************************************)
 
-translate[Rule[_,r_]] := translate[r]
+translate[Rule[_, r_]] := translate[r]
 translate[Log[10, z_]] := "log10(" <> translate[z] <> ")"
 translate[Log[b_, z_]] := "log(" <> translate[z] <> ")./log(" <> translate[b] <> ")"
 translate[Power[e_, 1/2]] := "sqrt(" <> translate[e] <> ")"
@@ -164,6 +169,21 @@ args[e_] := If[Length[e] === 1, translate[e[[1]]], translate[e[[1]]] <> ", " <> 
 list[e_] := Block[{ARGSLISTINDEX}, Table[ e[[ARGSLISTINDEX]], {ARGSLISTINDEX, 1, Length[e]}]]
 listshift[e_] := Block[{ARGSLISTINDEX}, Table[e[[ARGSLISTINDEX]], {ARGSLISTINDEX, 2, Length[e]}]] (* Removes HEAD *)
 listshiftretain[e_] := e[[Block[{i}, Table[i, {i, 2, Length[e]}]]]] (* Keeps HEAD *)
+
+linewrap[s_String, m_Integer] := Block[{cut, sin=s, sout=""},
+	While[StringLength[sin] >= m,
+		cut = findcut[sin, m];
+	    If[cut > 0,		
+			(sout = sout <> StringTake[sin, cut] <> " ...\n"; sin = StringDrop[sin, cut]),
+			(sout = sout <> StringTake[sin, m]; sin = StringDrop[sin, m]);
+		]
+	] sout <> sin
+]
+
+findcut[s_String, m_Integer] := Block[{i = m}, 
+	While[i > 0 && !MemberQ[{";", ",", "(", ")", "+", "*", " "}, StringTake[s, {i}]], i--];
+	i
+]
 
 End[]
 EndPackage[]
