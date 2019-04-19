@@ -4,11 +4,11 @@
 A Wolfram Language Package for converting Mathematica syntax to MATLAB code. It was originally created by Harri Ojanen, but has been updated and modified for functionality and clarity.
 
 ## Installation
-Download `ToMatlab.wl` to somewhere permanent on your machine. You can download the file by clicking <a href="https://raw.githubusercontent.com/thearchitector/Mathematica-MATLAB/master/ToMatlab.wl" download>here</a>. It is recommened that the file be placed witihin the `Mathematica\Applications` folder in your OS application data directory. On Windows, it can be accessed by pressing **Windows + R**, and entering `%appdata%\Mathematica\Applications`.
+Download `ToMatlab.wl` to somewhere permanent on your machine. You can download the file by clicking <a href="https://raw.githubusercontent.com/thearchitector/Mathematica-MATLAB/master/ToMatlab.wl" download>here</a>. It is recommended that the file be placed witihin the `Mathematica\Applications` folder in your OS application data directory. On Windows, it can be accessed by pressing **Windows + R**, and entering `%appdata%\Mathematica\Applications`.
 
 To use the package, open any Wolfram Mathematica file. Navigate to `File -> Install...`. When the dialog box opens, select `Package` as the type of item to install. For its source, select `From File...`, navigate to wherever you downloaded the file, and choose it. Leave all the other options as their default values, and click `Ok`.
 
-_NOTE: If you want to download a newer version of this package at a later date, you must follow all the above installation steps again. The packages do not update if you simply change the source file._
+_NOTE: If you want to download a newer version of this package at a later date, you must follow all the above installation steps again. The packages do not update if you simply change the file._
 
 ## Usage
 Usage of the package is very simple. In whatever Mathematica script you are editing, add

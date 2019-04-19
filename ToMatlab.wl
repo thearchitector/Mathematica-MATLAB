@@ -26,17 +26,18 @@ ToMatlab::invtrans = "Matrix transposition option expects True or False, not `1`
 ToMatlab::invmargin = "Viewport margin must be an integer value, not `1`."
 
 ToMatlab[e_, OptionsPattern[]] := Catch[Block[{},
+	SetOptions[$FrontEndSession, "ExportTypesetOptions" -> {"PageWidth" -> 90}];
 	If[!BooleanQ[OptionValue[SuppressOutput]], Throw[Message[ToMatlab::invsupp, OptionValue[SuppressOutput]]]];
 	If[!BooleanQ[OptionValue[Transposed]], Throw[Message[ToMatlab::invtrans, OptionValue[Transposed]]]];
 	If[!IntegerQ[OptionValue[Viewport]], Throw[Message[ToMatlab::invmargin, OptionValue[Viewport]]]];
 
-	linewrap[If[ListQ[e] || MatrixQ[e],
+	Print[linewrap[If[ListQ[e] || MatrixQ[e],
 		Block[{lm = If[Length[Dimensions[e]] > 1, e, {e}]}, translate[If[OptionValue[Transposed], Transpose[lm], lm]]],
 		translate[e]
-	], GetOption[Viewport]
-] <> If[OptionValue[SuppressOutput], ";", ""]]]
+	], Min[OptionValue[Viewport], 66]] <> If[OptionValue[SuppressOutput], ";", ""]];
+]]
 
-Options[ToMatlab] = {SuppressOutput -> True, Transposed -> False, Viewport -> 72}
+Options[ToMatlab] = {SuppressOutput -> True, Transposed -> False, Viewport -> 66}
 
 
 (*** Numbers and strings *****************************************************)
@@ -177,7 +178,8 @@ linewrap[s_String, m_Integer] := Block[{cut, sin=s, sout=""},
 			(sout = sout <> StringTake[sin, cut] <> " ...\n"; sin = StringDrop[sin, cut]),
 			(sout = sout <> StringTake[sin, m]; sin = StringDrop[sin, m]);
 		]
-	] sout <> sin
+	];
+	sout <> sin
 ]
 
 findcut[s_String, m_Integer] := Block[{i = m}, 
